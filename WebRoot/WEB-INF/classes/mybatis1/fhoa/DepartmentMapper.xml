@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DepartmentMapper">
+	
+	<resultMap type="Department" id="departmentResultMap">
+		<id column="DEPARTMENT_ID" property="DEPARTMENT_ID"/>
+		<result column="NAME" property="NAME"/>
+		<result column="PARENT_ID" property="PARENT_ID"/>
+	</resultMap>
+	
+	<!--表名 -->
+	<sql id="tableName">
+		OA_DEPARTMENT
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		NAME,	
+		NAME_EN,	
+		BIANMA,	
+		PARENT_ID,
+		HEADMAN,
+		TEL,
+		FUNCTIONS,
+		ADDRESS,
+		BZ,	
+		DEPARTMENT_ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{NAME},	
+		#{NAME_EN},	
+		#{BIANMA},	
+		#{PARENT_ID},
+		#{HEADMAN},
+		#{TEL},
+		#{FUNCTIONS},
+		#{ADDRESS},
+		#{BZ},	
+		#{DEPARTMENT_ID}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			DEPARTMENT_ID = #{DEPARTMENT_ID}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+			NAME = #{NAME},
+			NAME_EN = #{NAME_EN},
+			HEADMAN = #{HEADMAN},
+			BZ = #{BZ},
+			TEL = #{TEL},
+			FUNCTIONS = #{FUNCTIONS},
+			ADDRESS = #{ADDRESS},
+			DEPARTMENT_ID = DEPARTMENT_ID
+		where 
+		DEPARTMENT_ID = #{DEPARTMENT_ID}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			DEPARTMENT_ID = #{DEPARTMENT_ID}
+	</select>
+	
+	<!-- 通过编码获取数据 -->
+	<select id="findByBianma" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			BIANMA = #{BIANMA}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where
+			1=1
+		<if test="pd.DEPARTMENT_ID!= null and pd.DEPARTMENT_ID != ''"><!-- 检索 -->
+		and PARENT_ID = #{pd.DEPARTMENT_ID}
+		</if>
+		<if test="pd.keywords != null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+				 NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 or 
+				 NAME_EN LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+				 or
+				 BIANMA LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+		order by NAME
+	</select>
+	
+	<!-- 通过ID获取其子级列表 -->
+	<select id="listSubDepartmentByParentId" parameterType="String" resultMap="departmentResultMap">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			PARENT_ID = #{parentId} order by NAME 
+	</select>
+	
+	<!-- fh313596790qq(青苔) -->
+</mapper>

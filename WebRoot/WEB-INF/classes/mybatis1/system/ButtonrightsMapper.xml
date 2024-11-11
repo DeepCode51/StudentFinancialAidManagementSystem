@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ButtonrightsMapper">
+	
+	<!--关联表名 -->
+	<sql id="tableName">
+		SYS_ROLE_FHBUTTON
+	</sql>
+	
+	<!--按钮表名 -->
+	<sql id="buttontableName">
+		SYS_FHBUTTON
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		RB_ID,	
+		ROLE_ID,
+		BUTTON_ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{RB_ID},	
+		#{ROLE_ID},
+		#{BUTTON_ID}
+	</sql>
+	
+	<!-- 按钮表字段 -->
+	<sql id="buttonField">
+		QX_NAME	
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 通过(角色ID和按钮ID)获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			ROLE_ID = #{ROLE_ID}
+		and
+			BUTTON_ID = #{BUTTON_ID}
+	</select>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			ROLE_ID = #{ROLE_ID}
+		and
+			BUTTON_ID = #{BUTTON_ID}
+	</delete>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<!-- 列表(全部)左连接按钮表,查出安全权限标识(主副职角色综合)-->
+	<select id="listAllBrAndQxnameByZF" parameterType="String" resultType="pd">
+		select
+		<include refid="buttonField"></include>
+		from 
+		<include refid="tableName"></include> a
+		left join
+		<include refid="buttontableName"></include> b
+		on
+			a.BUTTON_ID = b.FHBUTTON_ID
+		where
+			a.ROLE_ID in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</select>
+	
+	<!-- 列表(全部)左连接按钮表,查出安全权限标识(主职角色)-->
+	<select id="listAllBrAndQxname" parameterType="pd" resultType="pd">
+		select
+		<include refid="buttonField"></include>
+		from 
+		<include refid="tableName"></include> a
+		left join
+		<include refid="buttontableName"></include> b
+		on
+			a.BUTTON_ID = b.FHBUTTON_ID
+		where
+			a.ROLE_ID = #{ROLE_ID}
+	</select>
+	
+	<!-- fh313596790qq(青苔) -->
+</mapper>

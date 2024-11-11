@@ -1,0 +1,163 @@
+@charset "utf-8";
+/*
+=======================================================================
+	General Rules
+=======================================================================
+*/
+
+
+#wrapper_sec {
+	width:1020px;
+	margin:0px auto;
+	z-index:2;
+	float: left;
+}
+
+
+* {
+	padding:0px;
+	margin:0px;
+}
+
+
+/*
+=======================================================================
+	Banner Rules
+=======================================================================
+*/
+#banner {
+	width:1010px;
+	height:510px;
+	padding:8px;
+	background-color:#111111;
+	border:#f9f9f9 solid 10px;
+	border-bottom:none;
+}
+#banner .leftsecbanner{
+	width:660px;
+	height:510px;
+	overflow:hidden;
+	float:left;
+}
+#banner object{
+	z-index:1;
+	position:absolute;
+}
+#banner #paginate-slider2 {
+	width:309px;
+	height:490px;
+	float:right;
+	background-color:#202020;
+}
+#banner ul.idTabs{
+	float:left;
+	list-style:none;
+	border-bottom:#4b7eff solid 2px;
+	margin:2px 0px 0px 2px;
+}
+#banner ul.idTabs li{
+	float:left;
+	cursor:pointer;
+}
+#banner ul.idTabs li a{
+	float:left;
+	display:inline-block;
+	background-image:url(../images/tab.gif);
+	background-repeat:no-repeat;
+	background-position:left;
+	height:36px;
+	padding-left:20px;
+	font-size:12px;
+	color:#fff;
+	cursor:pointer;
+}
+#banner ul.idTabs li a span{
+	float:left;
+	display:inline-block;
+	background-image:url(../images/tab.gif);
+	background-repeat:no-repeat;
+	background-position:right;
+	height:36px;
+	padding:10px 20px 0px 0px;
+	cursor:pointer;
+}
+#banner ul.idTabs li a:hover{
+	background-image:url(../images/tab_rol.gif);
+}
+#banner ul.idTabs li a:hover span{
+	background-image:url(../images/tab_rol.gif);
+}
+#banner ul.idTabs li a.selected{
+	background-image:url(../images/tab_rol.gif);
+}
+#banner ul.idTabs li a.selected span{
+	background-image:url(../images/tab_rol.gif);
+}
+
+#banner .tabssection{
+	width:100%;
+	float:left;
+}
+#banner .tabssection a.toc{
+	float:left;
+	display:inline-block;
+	padding:10px 8px 10px 2px;
+}
+#banner .tabssection a.toc:hover{
+	background-image:url(../images/slider_hover.gif);
+	background-repeat:repeat-x;
+	background-color:#0a0a0a;
+}
+#banner .tabssection a.selected{
+	background-image:url(../images/slider_hover.gif);
+	background-repeat:repeat-x;
+	background-color:#0a0a0a;
+}
+#banner .tabssection a.toc span.thumb{
+	float:left;
+	border:#8f8f8f solid 1px;
+	background-color:#f7f7f7;
+	padding:1px;
+	margin:0px 10px;
+}
+#banner .tabssection a.toc span.desc{
+	float:right;
+	width:175px;
+}
+#banner .tabssection a.toc span.title{
+	font-size:12px;
+	color:#fefefe;
+	width:180px;
+	display:inline-block;
+	margin-bottom:10px;
+}
+#banner .tabssection a.toc span.time{
+	color:#666666;
+	float:left;
+	width:39px;
+	height:16px;
+	padding-top:2px;
+	display:inline-block;
+	background-image:url(../images/time1.png);
+	font-size:11px;
+	text-align:center;
+}
+#banner .tabssection a.toc span.channel{
+	font-size:12px;
+	color:#666666;
+	float:left;
+	margin-left:10px;
+	padding-top:1px;
+}
+/*
+=======================================================================
+	Content Section
+=======================================================================
+*/
+#content_sec {
+	width:1000px;
+	float:left;
+	background-color:#f9f9f9;
+	border:#f9f9f9 solid 10px;
+}
+

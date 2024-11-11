@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RoleMapper">
+	
+	<resultMap type="Role" id="roleResultMap">
+		<id column="ROLE_ID" property="ROLE_ID"/>
+		<result column="ROLE_NAME" property="ROLE_NAME"/>
+		<result column="RIGHTS" property="RIGHTS"/>
+	</resultMap>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		ROLE_ID,
+		ROLE_NAME,
+		RIGHTS,
+		PARENT_ID,
+		ADD_QX,
+		DEL_QX,
+		EDIT_QX,
+		CHA_QX,
+		RNUMBER
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ROLE_ID},
+		#{ROLE_NAME},
+		#{RIGHTS},
+		#{PARENT_ID},
+		#{ADD_QX},
+		#{DEL_QX},
+		#{EDIT_QX},
+		#{CHA_QX},
+		#{RNUMBER}
+	</sql>
+	
+	<!--表名 -->
+	<sql id="tableName">
+		SYS_ROLE
+	</sql>
+	
+	<!-- 列出此组下的角色 -->
+	<select id="listAllRolesByPId" resultMap="roleResultMap">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+			PARENT_ID = #{ROLE_ID}
+		ORDER BY RNUMBER
+	</select>
+	
+	<!-- 通过id查找 -->
+	<select id="findObjectById" parameterType="pd" resultType="pd">
+		select  
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where ROLE_ID = #{ROLE_ID}
+	</select>
+	
+	<!-- 通过编码查找 -->
+	<select id="getRoleByRnumber" parameterType="pd" resultType="pd">
+		select  
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where RNUMBER = #{RNUMBER}
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterType="pd">
+		insert into 
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>	
+		)
+	</insert>
+	
+	<!-- 保存修改 -->
+	<update id="edit" parameterType="pd">
+		update 
+		<include refid="tableName"></include>
+		set ROLE_NAME = #{ROLE_NAME}
+		where ROLE_ID = #{ROLE_ID}
+	</update>
+	
+	<!-- 删除角色  -->
+	<delete id="deleteRoleById" parameterType="String">
+		delete from 
+		<include refid="tableName"></include>
+		where ROLE_ID=#{ROLE_ID}
+	</delete>
+	
+	<!-- 给当前角色附加菜单权限  -->
+	<update id="updateRoleRights" parameterType="Role">
+		update 
+		<include refid="tableName"></include>
+		set RIGHTS=#{RIGHTS} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<!-- 通过id查找 -->
+	<select id="getRoleById" parameterType="String" resultMap="roleResultMap">
+		select * from 
+		<include refid="tableName"></include>
+		where ROLE_ID=#{ROLE_ID}
+	</select>
+	
+	<!-- 给全部子角色加菜单权限 -->
+	<update id="setAllRights" parameterType="pd">
+		update 
+		<include refid="tableName"></include> 
+		set RIGHTS=#{rights} 
+		where PARENT_ID=#{ROLE_ID}
+	</update>
+	
+	<!-- 新增权限 -->
+	<update id="add_qx" parameterType="pd">
+		update 
+		<include refid="tableName"></include> 
+		set ADD_QX=#{value} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<!-- 删除权限 -->
+	<update id="del_qx" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set DEL_QX=#{value} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<!-- 修改权限 -->
+	<update id="edit_qx" parameterType="pd">
+		update 
+		<include refid="tableName"></include> 
+		set EDIT_QX=#{value} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<!-- 查看权限 -->
+	<update id="cha_qx" parameterType="pd">
+		update 
+		<include refid="tableName"></include>
+		set CHA_QX=#{value} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<!-- 通过角色ID数组获取角色列表 -->
+	<select id="listAllRolesByArryROLE_ID" parameterType="String" resultType="Role" >
+		select
+			RNUMBER
+		from
+			<include refid="tableName"></include>
+		where 
+			ROLE_ID in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</select>
+	
+	<!-- 角色列表(弹窗选择用) -->
+	<select id="roleWindowlistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					ROLE_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or 
+					RNUMBER LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+				)
+		</if>
+		<if test="pd.ROLE_ID != null and pd.ROLE_ID != ''">
+			and PARENT_ID = #{pd.ROLE_ID} 
+		</if>
+		ORDER BY RNUMBER
+	</select>
+	
+	<!-- fh313596790qq(青苔) -->
+</mapper>

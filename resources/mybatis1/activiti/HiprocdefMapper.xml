@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HiprocdefMapper">
+	
+	<!--流程历史表名 -->
+	<sql id="tableName">
+		ACT_HI_PROCINST
+	</sql>
+	
+	<!--流程定义表 -->
+	<sql id="ptableName">
+		ACT_RE_PROCDEF
+	</sql>
+	
+	<!--历史流程变量表 -->
+	<sql id="hivartableName">
+		ACT_HI_VARINST
+	</sql>
+	
+	<!-- 历史流程列表-->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+			hp.*,
+			rp.NAME_ PNAME_,
+			rp.VERSION_,
+			rp.ID_ PID_,
+			rp.DEPLOYMENT_ID_,
+			rp.DGRM_RESOURCE_NAME_
+		from 
+		<include refid="tableName"></include> hp
+		left join
+		<include refid="ptableName"></include> rp
+		on hp.PROC_DEF_ID_ = rp.ID_
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					rp.NAME_ LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+		<if test="pd.lastStart != null and pd.lastStart != ''"><!-- 开始时间检索 -->
+			and hp.END_TIME_ &gt;= #{pd.lastStart} 
+		</if>
+		<if test="pd.lastEnd != null and pd.lastEnd != ''"><!-- 结束时间检索 -->
+			and hp.END_TIME_ &lt;= #{pd.lastEnd} 
+		</if>
+		and hp.END_TIME_ is not NULL
+		order by hp.END_TIME_ desc
+	</select>
+	
+	<!-- 历史流程变量列表 -->
+	<select id="hivarList" parameterType="pd" resultType="pd">
+		select
+			*
+		from 
+			<include refid="hivartableName"></include>
+		where 1=1
+		<if test="PROC_INST_ID_ != null and PROC_INST_ID_ != ''"><!-- 流程实例ID -->
+			and PROC_INST_ID_ = #{PROC_INST_ID_}
+			and TASK_ID_ is NULL
+		</if>
+	</select>
+	
+	<!-- fh313596790qq(青苔) -->
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/context 
+						http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/tx 
+						http://www.springframework.org/schema/tx/spring-tx.xsd
+	">
+	
+		<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+			<property name="realm" ref="ShiroRealm" />
+		</bean>
+		
+		<!-- 項目自定义的Realm -->
+	    <bean id="ShiroRealm" class="com.fh.interceptor.shiro.ShiroRealm" ></bean>
+		
+		<!-- Shiro Filter -->
+		<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+			<property name="securityManager" ref="securityManager" />
+			
+			<property name="loginUrl" value="/" />
+			
+			<property name="successUrl" value="/main/index" />
+			
+			<property name="unauthorizedUrl" value="/login_toLogin" />
+			
+			<property name="filterChainDefinitions">
+				<value>
+				/static/login/** 			= anon
+				/plugins/keypad/** 			= anon
+				/static/js/myjs/** 			= authc
+				/static/js/** 				= anon
+				/uploadFiles/uploadImgs/** 	= anon
+	           	/code.do 					= anon
+	           	/login_login	 			= anon
+	           	/app**/** 					= anon
+	           	/weixin/** 					= anon
+	           	/**							= authc
+				</value>
+			</property>
+		</bean>
+   
+</beans>

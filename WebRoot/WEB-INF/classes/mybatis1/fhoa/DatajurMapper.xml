@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DatajurMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		OA_DATAJUR
+	</sql>
+	
+	<!--员工表 -->
+	<sql id="STAFF_tableName">
+		OA_STAFF
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		DEPARTMENT_IDS,
+		DEPARTMENT_ID,
+		STAFF_ID,	
+		DATAJUR_ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{DEPARTMENT_IDS},
+		#{DEPARTMENT_ID},	
+		#{STAFF_ID},	
+		#{DATAJUR_ID}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+		DEPARTMENT_IDS = #{DEPARTMENT_IDS},
+		DEPARTMENT_ID = #{DEPARTMENT_ID}
+		where 
+		DATAJUR_ID = #{DATAJUR_ID}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			DATAJUR_ID = #{DATAJUR_ID}
+	</select>
+	
+	<!-- 取出某用户的组织数据权限 -->
+	<select id="getDEPARTMENT_IDS" parameterType="String" resultType="pd">
+		select 
+			b.DEPARTMENT_IDS,
+			b.DEPARTMENT_ID
+		from 
+			<include refid="STAFF_tableName"></include> a, <include refid="tableName"></include> b 
+		where 
+			a.STAFF_ID = b.STAFF_ID 
+		and 
+			a.USER_ID = #{USERNAME}
+	</select>
+	
+	<!-- fh313596790qq(青苔) -->
+</mapper>

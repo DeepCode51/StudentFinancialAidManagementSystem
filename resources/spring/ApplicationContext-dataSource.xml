@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/context 
+						http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/tx 
+						http://www.springframework.org/schema/tx/spring-tx.xsd
+	">
+	
+	<!-- ====================数据源1==================== -->
+	<!-- sql会话模版 -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+	<!-- 配置mybatis -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    	<property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:mybatis1/mybatis-config.xml"></property>
+        <!-- mapper扫描 -->
+        <property name="mapperLocations" value="classpath:mybatis1/*/*.xml"></property>
+    </bean>
+	<!-- 阿里 druid数据库连接池 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">  
+         <!-- 数据库基本信息配置 -->
+         <property name="url" value="${url}" />  
+         <property name="username" value="${username}" />  
+         <property name="password" value="${password}" />  
+         <property name="driverClassName" value="${driverClassName}" />  
+         <property name="filters" value="${filters}" />  
+   		 <!-- 最大并发连接数 -->
+         <property name="maxActive" value="${maxActive}" />
+         <!-- 初始化连接数量 -->
+         <property name="initialSize" value="${initialSize}" />
+         <!-- 配置获取连接等待超时的时间 -->
+         <property name="maxWait" value="${maxWait}" />
+         <!-- 最小空闲连接数 -->
+         <property name="minIdle" value="${minIdle}" />  
+   		 <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+         <property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}" />
+         <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+         <property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}" />  
+         <property name="validationQuery" value="${validationQuery}" />  
+         <property name="testWhileIdle" value="${testWhileIdle}" />  
+         <property name="testOnBorrow" value="${testOnBorrow}" />  
+         <property name="testOnReturn" value="${testOnReturn}" />  
+         <property name="maxOpenPreparedStatements" value="${maxOpenPreparedStatements}" />
+         <!-- 打开removeAbandoned功能 -->
+         <property name="removeAbandoned" value="${removeAbandoned}" />
+         <!-- 1800秒，也就是30分钟 -->
+         <property name="removeAbandonedTimeout" value="${removeAbandonedTimeout}" />
+         <!-- 关闭abanded连接时输出错误日志 -->   
+         <property name="logAbandoned" value="${logAbandoned}" />
+	</bean>  
+	<!-- 事物处理 -->
+	<aop:config>
+		<aop:pointcut id="pc" expression="execution(* com.fh.service..*(..))" />
+		<aop:advisor pointcut-ref="pc" advice-ref="txAdvice" />
+	</aop:config>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="delete*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception"/>
+			<tx:method name="insert*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception" />
+			<tx:method name="update*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception" />
+			<tx:method name="save*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception" />
+		</tx:attributes>
+	</tx:advice>
+	<bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">   
+    	<property name="dataSource" ref="dataSource"></property>
+ 	</bean>
+	
+	
+	<!-- ====================数据源2==================== -->
+	<!--
+	<bean id="sqlSessionTemplate2" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory2" />
+	</bean>
+	<bean id="sqlSessionFactory2" class="org.mybatis.spring.SqlSessionFactoryBean">
+    	<property name="dataSource" ref="dataSource2" />
+        <property name="configLocation" value="classpath:mybatis2/mybatis-config.xml"></property>
+        <property name="mapperLocations" value="classpath:mybatis2/*/*.xml"></property>
+    </bean>
+	<bean id="dataSource2" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">  
+         <property name="url" value="${url2}" />  
+         <property name="username" value="${username2}" />  
+         <property name="password" value="${password2}" />  
+         <property name="driverClassName" value="${driverClassName2}" />  
+         <property name="filters" value="${filters2}" />  
+         <property name="maxActive" value="${maxActive2}" />
+         <property name="initialSize" value="${initialSize2}" />
+         <property name="maxWait" value="${maxWait2}" />
+         <property name="minIdle" value="${minIdle2}" />  
+         <property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis2}" />
+         <property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis2}" />  
+         <property name="validationQuery" value="${validationQuery2}" />  
+         <property name="testWhileIdle" value="${testWhileIdle2}" />  
+         <property name="testOnBorrow" value="${testOnBorrow2}" />  
+         <property name="testOnReturn" value="${testOnReturn2}" />  
+         <property name="maxOpenPreparedStatements" value="${maxOpenPreparedStatements2}" />
+         <property name="removeAbandoned" value="${removeAbandoned2}" />
+         <property name="removeAbandonedTimeout" value="${removeAbandonedTimeout2}" />
+         <property name="logAbandoned" value="${logAbandoned2}" />
+	</bean>  
+	<aop:config>
+		<aop:pointcut id="pc2" expression="execution(* com.fh.service..*(..))" />
+		<aop:advisor pointcut-ref="pc2" advice-ref="txAdvice2" />
+	</aop:config>
+	<tx:advice id="txAdvice2" transaction-manager="transactionManager2">
+		<tx:attributes>
+			<tx:method name="delete*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception"/>
+			<tx:method name="insert*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception" />
+			<tx:method name="update*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception" />
+			<tx:method name="save*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception" />
+		</tx:attributes>
+	</tx:advice>
+	<bean name="transactionManager2" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">   
+    	<property name="dataSource" ref="dataSource2"></property>
+ 	</bean>
+ 	-->
+ 	<!-- QQ313596790 -->
+</beans>

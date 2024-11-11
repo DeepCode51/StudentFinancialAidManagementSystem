@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RuprocdefMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		ACT_RU_TASK
+	</sql>
+	
+	<!--流程实例表 -->
+	<sql id="ptableName">
+		ACT_RE_PROCDEF
+	</sql>
+	
+	<!--流程变量表 -->
+	<sql id="vartableName">
+		ACT_RU_VARIABLE
+	</sql>
+	
+	<!--历史任务节点表 -->
+	<sql id="hitinsttableName">
+		ACT_HI_ACTINST
+	</sql>
+	
+	<!--历史任务表 -->
+	<sql id="hitasktableName">
+		ACT_HI_TASKINST
+	</sql>
+	
+	<!--历史流程变量表 -->
+	<sql id="hivartableName">
+		ACT_HI_VARINST
+	</sql>
+	
+	<!-- 待办任务 or正在运行任务列表-->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+			f.*,
+			p.NAME_ PNAME_,
+			p.DGRM_RESOURCE_NAME_
+		from 
+		<include refid="tableName"></include> f
+		left join
+		<include refid="ptableName"></include> p
+		on f.PROC_DEF_ID_ = p.ID_
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					p.NAME_ LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or 
+					f.NAME_ LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or 
+					f.ASSIGNEE_ LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+		<if test="pd.lastStart != null and pd.lastStart != ''"><!-- 开始时间检索 -->
+			and f.CREATE_TIME_ &gt;= #{pd.lastStart} 
+		</if>
+		<if test="pd.lastEnd != null and pd.lastEnd != ''"><!-- 结束时间检索 -->
+			and f.CREATE_TIME_ &lt;= #{pd.lastEnd} 
+		</if>
+		<if test="pd.USERNAME != null and pd.USERNAME != ''"><!-- 当前办理人检索 -->
+			and 
+				(
+					f.ASSIGNEE_ = #{pd.USERNAME} 
+					or
+					f.ASSIGNEE_ in ${pd.RNUMBERS}  
+		    	)
+		</if>
+		order by f.CREATE_TIME_ desc
+	</select>
+	
+	<!-- 已办任务列表-->
+	<select id="hitaskdatalistPage" parameterType="page" resultType="pd">
+		select
+			f.*,
+			p.NAME_ PNAME_,
+			p.DEPLOYMENT_ID_,
+			p.DGRM_RESOURCE_NAME_
+		from
+		(
+			select
+				 n.* 
+			from <include refid="hitasktableName"></include> n 
+			where (
+					n.ASSIGNEE_ = #{pd.USERNAME} 
+					or
+					n.ASSIGNEE_ in ${pd.RNUMBERS}  
+	    		  )
+			group by n.EXECUTION_ID_
+		
+		) f
+		left join
+		<include refid="ptableName"></include> p
+		on f.PROC_DEF_ID_ = p.ID_
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					p.NAME_ LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or 
+					f.NAME_ LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or 
+					f.ASSIGNEE_ LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+		<if test="pd.lastStart != null and pd.lastStart != ''"><!-- 开始时间检索 -->
+			and f.END_TIME_ &gt;= #{pd.lastStart} 
+		</if>
+		<if test="pd.lastEnd != null and pd.lastEnd != ''"><!-- 结束时间检索 -->
+			and f.END_TIME_ &lt;= #{pd.lastEnd} 
+		</if>
+		<if test="pd.USERNAME != null and pd.USERNAME != ''"><!-- 办理人检索 -->
+			and 
+				(
+					f.ASSIGNEE_ = #{pd.USERNAME} 
+					or
+					f.ASSIGNEE_ in ${pd.RNUMBERS}  
+		    	)
+		</if>
+		and f.END_TIME_ is not NULL
+		order by f.END_TIME_ desc
+	</select>
+	
+	<!-- 流程变量列表 -->
+	<select id="varList" parameterType="pd" resultType="pd">
+		select
+			*
+		from 
+			<include refid="vartableName"></include>
+		where 1=1
+		<if test="PROC_INST_ID_ != null and PROC_INST_ID_ != ''"><!-- 流程实例ID -->
+			and PROC_INST_ID_ = #{PROC_INST_ID_}
+			and TASK_ID_ is NULL
+		</if>
+	</select>
+	
+	<!-- 历史任务节点列表关联历史流程变量表 -->
+	<select id="hiTaskList" parameterType="pd" resultType="pd">
+		select
+			ht.*,
+			hv.TEXT_
+		from 
+			<include refid="hitinsttableName"></include> ht
+		left join
+			<include refid="hivartableName"></include> hv
+		on ht.TASK_ID_ = hv.TASK_ID_
+		where 1=1
+		<if test="PROC_INST_ID_ != null and PROC_INST_ID_ != ''"><!-- 流程实例ID -->
+			and ht.PROC_INST_ID_ = #{PROC_INST_ID_} 
+		</if>
+		order by ht.ID_
+	</select>
+	
+	<!-- 激活or挂起任务(指定某个任务) -->
+	<update id="onoffTask" parameterType="pd" >
+		update
+		<include refid="tableName"></include>
+		set 
+			SUSPENSION_STATE_ = #{STATUS} 
+		where ID_ = #{ID_}
+	</update>
+	
+	<!-- 激活or挂起任务(指定某个流程的所有任务) -->
+	<update id="onoffAllTask" parameterType="pd" >
+		update
+		<include refid="tableName"></include>
+		set 
+			SUSPENSION_STATE_ = #{STATUS} 
+		where PROC_DEF_ID_ = #{ID_}
+	</update>
+	
+	<!-- fh313596790qq(青苔) -->
+</mapper>

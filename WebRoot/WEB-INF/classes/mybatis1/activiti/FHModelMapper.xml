@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FHModelMapper">
+	
+	<!--模型表名 -->
+	<sql id="tableName">
+		ACT_RE_MODEL
+	</sql>
+	
+	<!--数据字典表名 -->
+	<sql id="dicTableName">
+		SYS_DICTIONARIES
+	</sql>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+			a.ID_,	
+			a.REV_,	
+			a.NAME_,	
+			a.KEY_,	
+			a.CATEGORY_,	
+			a.CREATE_TIME_,	
+			a.LAST_UPDATE_TIME_,	
+			a.VERSION_,
+			d.BIANMA,
+			d.NAME DNAME
+		from 
+		<include refid="tableName"></include> a
+		left join 
+		<include refid="dicTableName"></include> d
+		on a.CATEGORY_ = d.BIANMA
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					a.NAME_ LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+		<if test="pd.category != null and pd.category != ''"><!-- 分类检索 -->
+			and a.CATEGORY_=#{pd.category} 
+		</if>
+		order by a.LAST_UPDATE_TIME_ desc
+	</select>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			ID_,
+			CATEGORY_
+		from 
+		<include refid="tableName"></include>
+		where 
+			ID_ = #{ID_}
+	</select>
+	
+	<!-- 修改类型 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+			CATEGORY_ = #{category}
+		where 
+			ID_ = #{ID_}
+	</update>
+	
+	<!-- fh313596790qq(青苔) -->
+</mapper>

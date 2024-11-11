@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppuserMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		SYS_APP_USER
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		USER_ID,
+		USERNAME,
+		PASSWORD,
+		NAME,
+		RIGHTS,
+		ROLE_ID,
+		LAST_LOGIN,
+		IP,
+		STATUS,
+		BZ,
+		PHONE,
+		SFID,
+		START_TIME,
+		END_TIME,
+		YEARS,
+		EMAIL,
+		NUMBER
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{USER_ID},
+		#{USERNAME},
+		#{PASSWORD},
+		#{NAME},
+		#{RIGHTS},
+		#{ROLE_ID},
+		#{LAST_LOGIN},
+		#{IP},
+		#{STATUS},
+		#{BZ},
+		#{PHONE},
+		#{SFID},
+		#{START_TIME},
+		#{END_TIME},
+		#{YEARS},
+		#{EMAIL},
+		#{NUMBER}	
+	</sql>
+	
+	<!-- 角色表 -->
+	<sql id="roleTableName">
+		SYS_ROLE
+	</sql>
+	
+	<!-- 列出某角色下的所有会员 -->
+	<select id="listAllAppuserByRorlid"  parameterType="pd" resultType="pd" >
+		select 
+			USER_ID
+		from 
+		<include refid="tableName"></include>
+		where 
+			ROLE_ID = #{ROLE_ID}
+	</select>
+	
+	<!-- 会员列表 -->
+	<select id="userlistPage" parameterType="page" resultType="pd">
+		select  u.USER_ID,
+				u.USERNAME,
+				u.PASSWORD,
+				u.LAST_LOGIN,
+				u.NAME,
+				u.IP,
+				u.END_TIME,
+				u.YEARS,
+				u.STATUS,
+				u.EMAIL,
+				u.PHONE,
+				u.NUMBER,
+				r.ROLE_ID,
+				r.ROLE_NAME
+		from <include refid="tableName"></include> u, <include refid="roleTableName"></include> r 
+		where u.ROLE_ID = r.ROLE_ID 
+		and r.PARENT_ID = '2'
+		<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+			and (
+				u.USERNAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				u.EMAIL LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				or
+				u.NUMBER LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				)
+		</if>
+		<if test="pd.ROLE_ID != null and pd.ROLE_ID != ''"><!-- 角色检索 -->
+			and u.ROLE_ID=#{pd.ROLE_ID} 
+		</if>
+		<if test="pd.lastLoginStart!=null and pd.lastLoginStart!=''"><!-- 到期时间检索 -->
+			and u.END_TIME &gt;= #{pd.lastLoginStart} 
+		</if>
+		<if test="pd.lastLoginEnd!=null and pd.lastLoginEnd!=''"><!-- 到期时间检索 -->
+			and u.END_TIME &lt;= #{pd.lastLoginEnd} 
+		</if>
+		<if test="pd.STATUS != null and pd.STATUS != ''"><!-- 状态检索 -->
+			and u.STATUS=#{pd.STATUS} 
+		</if>
+		order by u.NAME
+	</select>
+	
+	<!-- 通过USERNAME获取数据 -->
+	<select id="findByUsername" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			USERNAME = #{USERNAME}
+	</select>
+	
+	<!-- 通过邮箱获取数据 -->
+	<select id="findByEmail" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			EMAIL = #{EMAIL}
+		<if test="USERNAME != null and USERNAME != ''">
+			and USERNAME != #{USERNAME} 
+		</if>
+	</select>
+	
+	<!-- 通过编号获取数据 -->
+	<select id="findByNumber" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			NUMBER = #{NUMBER}
+		<if test="USERNAME != null and USERNAME != ''">
+			and USERNAME != #{USERNAME} 
+		</if>
+	</select>
+	
+	<!-- 新增会员 -->
+	<insert id="saveU" parameterType="pd">
+		insert into <include refid="tableName"></include> (
+			<include refid="Field"></include>
+		) values (
+			<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除用户 -->
+	<delete id="deleteU" parameterType="pd">
+		delete from <include refid="tableName"></include> 
+		where 
+			USER_ID = #{USER_ID}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="editU" parameterType="pd">
+		update  <include refid="tableName"></include>
+		set USERNAME				= #{USERNAME},
+			NAME					= #{NAME},
+			ROLE_ID 				= #{ROLE_ID},
+			BZ						= #{BZ},
+			PHONE 					= #{PHONE},
+			SFID 					= #{SFID},
+			START_TIME	 			= #{START_TIME},
+			END_TIME 				= #{END_TIME},
+			YEARS					= #{YEARS},
+			STATUS 					= #{STATUS},
+			EMAIL					= #{EMAIL},
+			NUMBER 					= #{NUMBER}
+		<if test="PASSWORD != null and PASSWORD != ''">
+			,PASSWORD				= #{PASSWORD}
+		</if>
+		where 
+			USER_ID = #{USER_ID}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findByUiId" parameterType="pd" resultType="pd">
+		select 
+			<include refid="Field"></include>
+		from 
+			<include refid="tableName"></include>
+		where 
+			USER_ID = #{USER_ID}
+	</select>
+	
+	<!-- 全部会员 -->
+	<select id="listAllUser" parameterType="pd" resultType="pd">
+		select  u.USER_ID,
+				u.USERNAME,
+				u.PASSWORD,
+				u.LAST_LOGIN,
+				u.NAME,
+				u.IP,
+				u.END_TIME,
+				u.YEARS,
+				u.STATUS,
+				u.EMAIL,
+				u.PHONE,
+				u.SFID,
+				u.NUMBER,
+				r.ROLE_ID,
+				r.ROLE_NAME
+		from <include refid="tableName"></include> u, <include refid="roleTableName"></include> r 
+		where u.ROLE_ID = r.ROLE_ID 
+		and r.PARENT_ID = '2'
+		<if test="keywords != null and keywords!= ''"><!-- 关键词检索 -->
+			and (
+				u.USERNAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				or
+				u.EMAIL LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				or
+				u.NUMBER LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				)
+		</if>
+		<if test="ROLE_ID != null and ROLE_ID != ''"><!-- 角色检索 -->
+			and u.ROLE_ID=#{ROLE_ID} 
+		</if>
+		<if test="lastLoginStart!=null and lastLoginStart!=''"><!-- 到期时间检索 -->
+			and u.END_TIME &gt;= #{lastLoginStart} 
+		</if>
+		<if test="lastLoginEnd!=null and lastLoginEnd!=''"><!-- 到期时间检索 -->
+			and u.END_TIME &lt;= #{lastLoginEnd} 
+		</if>
+		<if test="STATUS != null and STATUS != ''"><!-- 状态检索 -->
+			and u.STATUS=#{STATUS} 
+		</if>
+		order by u.NAME
+	</select>
+	
+	<!-- 批量删除用户 -->
+	<delete id="deleteAllU" parameterType="String">
+		delete from <include refid="tableName"></include>
+		where 
+			USER_ID in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</delete>
+	
+	<!-- 获取总数 -->
+	<select id="getAppUserCount" parameterType="String" resultType="pd">
+		select 
+			count(USER_ID) appUserCount
+		from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<!-- FH QQ313596790(青苔) -->
+</mapper>

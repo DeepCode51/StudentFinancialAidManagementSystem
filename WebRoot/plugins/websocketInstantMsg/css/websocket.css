@@ -1,0 +1,55 @@
+@CHARSET "UTF-8";
+.l-im-message-warn {
+	font-family: "微软雅黑";
+	cursor: default;
+	width: 100%;
+	padding: 5px 0px 5px 25px;
+	-webkit-user-select : none;
+	background: url("../images/information.png") no-repeat 5;
+}
+
+.l-im-message {
+	font-family: "微软雅黑";
+	cursor: default;
+	width: 100%;
+}
+
+.l-im-message-over {
+	background-color: rgba(233, 233, 233, 0.5);
+}
+
+.l-im-message-selected {
+	background-color: rgba(250, 218, 90, 0.5);
+}
+
+.l-im-message-header {
+	font-size: 12px;
+	padding: 5px 0px 5px 10px;
+}
+
+.l-im-message-header-self {
+	color: green;
+}
+.l-im-message-header-remote {
+	color: blue;
+}
+
+.l-im-message-body {
+	font-size: 12px;
+	padding: 2px 0px 2px 20px;
+}
+
+.user-win {
+	background-image: url( ../images/user_win.png )
+		!important;
+}
+
+.user-online {
+	background-image: url( ../images/group.png )
+		!important;
+}
+
+.user {
+	background-image: url( ../images/user.gif )
+		!important;
+}

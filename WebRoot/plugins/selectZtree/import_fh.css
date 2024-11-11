@@ -1,0 +1,92 @@
+﻿
+/*单选下拉框样式*/
+.mainCon{
+	position: relative;
+	display: inline-block;
+	z-index: 500;
+	float:left;
+}
+
+/*单选下拉框样式*/
+div.selectbox-wrapper {
+	border:#80c0e7 1px solid;  /*展开层边框色*/
+	position: absolute; 
+	background-color:#fff; 
+	text-align:left;
+	z-index: 100;
+	display:block;
+	left:0px;
+	top:18px;
+	>top:25px;
+}
+div.selectbox-wrapper ul li{
+	white-space:nowrap;
+}
+div.selectbox-wrapper ul li.selected {
+	background-color: #d9ebf5;/*选中项背景色*/
+}
+div.selectbox-wrapper ul li.current {
+	color: #fff;
+	background-color: #0081dd;/*鼠标移入项背景色*/
+	border:0!important;
+}
+
+.selectbox { 
+	border:none;  
+	cursor: pointer;  
+	cursor: hand;
+	font-size: 11px;
+	HEIGHT: 24px; 
+	line-height: 20px;
+	overflow-y:hidden;
+	border-left: solid 1px #80c0e7;/*边框色*/
+	border-top: solid 1px #80c0e7;/*边框色*/
+	border-bottom: solid 1px #80c0e7;/*边框色*/
+	background-repeat: repeat-x;
+	background-color:#ffffff;
+	padding-left:2px;
+}
+.tipColor{
+	color:gray;
+}
+.selBtn{
+	width: 22px;
+	height: 24px;
+	border: 0;
+	border-style:none;
+	background-image: url(form/selBtn.jpg);
+	background-repeat: no-repeat;
+	cursor: pointer;
+	cursor: hand;	
+}
+/*单选下拉框样式*/
+
+ /*树形下拉框样式*/
+div.selectbox-tree {
+	border:#80c0e7 1px solid;  /*展开层边框色*/
+	position: absolute; 
+	background-color:#fff; 
+	text-align:left;
+	z-index: 100;
+	display:block;
+	left:0px;
+	top:18px;
+	>top:25px;
+}
+
+.selectbox-tree a:hover{
+	background-color:#0081dd!important;/*鼠标移入项背景色*/
+	color:white!important;
+	text-decoration:none!important;
+}
+.multiSelectZtree li  a:hover{
+	background-color:#0081dd!important;/*鼠标移入项背景色*/
+}
+/*树形下拉框样式*/
+
+
+
+
+
+
+

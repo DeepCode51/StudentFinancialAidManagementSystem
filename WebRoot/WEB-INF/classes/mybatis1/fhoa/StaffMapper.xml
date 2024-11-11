@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StaffMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		OA_STAFF
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		NAME,	
+		NAME_EN,	
+		BIANMA,	
+		DEPARTMENT_ID,	
+		FUNCTIONS,	
+		TEL,	
+		EMAIL,	
+		SEX,	
+		BIRTHDAY,	
+		NATION,	
+		JOBTYPE,	
+		JOBJOINTIME,	
+		FADDRESS,	
+		POLITICAL,	
+		PJOINTIME,	
+		SFID,	
+		MARITAL,	
+		DJOINTIME,	
+		POST,	
+		POJOINTIME,	
+		EDUCATION,	
+		SCHOOL,	
+		MAJOR,	
+		FTITLE,	
+		CERTIFICATE,	
+		CONTRACTLENGTH,	
+		CSTARTTIME,	
+		CENDTIME,	
+		ADDRESS,	
+		USER_ID,	
+		BZ,	
+		STAFF_ID
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{NAME},	
+		#{NAME_EN},	
+		#{BIANMA},	
+		#{DEPARTMENT_ID},	
+		#{FUNCTIONS},	
+		#{TEL},	
+		#{EMAIL},	
+		#{SEX},	
+		#{BIRTHDAY},	
+		#{NATION},	
+		#{JOBTYPE},	
+		#{JOBJOINTIME},	
+		#{FADDRESS},	
+		#{POLITICAL},	
+		#{PJOINTIME},	
+		#{SFID},	
+		#{MARITAL},	
+		#{DJOINTIME},	
+		#{POST},	
+		#{POJOINTIME},	
+		#{EDUCATION},	
+		#{SCHOOL},	
+		#{MAJOR},	
+		#{FTITLE},	
+		#{CERTIFICATE},	
+		#{CONTRACTLENGTH},	
+		#{CSTARTTIME},	
+		#{CENDTIME},	
+		#{ADDRESS},	
+		#{USER_ID},	
+		#{BZ},	
+		#{STAFF_ID}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			STAFF_ID = #{STAFF_ID}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include> a
+		set 
+			NAME = #{NAME},
+			NAME_EN = #{NAME_EN},
+			BIANMA = #{BIANMA},
+			DEPARTMENT_ID = #{DEPARTMENT_ID},
+			FUNCTIONS = #{FUNCTIONS},
+			TEL = #{TEL},
+			EMAIL = #{EMAIL},
+			SEX = #{SEX},
+			BIRTHDAY = #{BIRTHDAY},
+			NATION = #{NATION},
+			JOBTYPE = #{JOBTYPE},
+			JOBJOINTIME = #{JOBJOINTIME},
+			FADDRESS = #{FADDRESS},
+			POLITICAL = #{POLITICAL},
+			PJOINTIME = #{PJOINTIME},
+			SFID = #{SFID},
+			MARITAL = #{MARITAL},
+			DJOINTIME = #{DJOINTIME},
+			POST = #{POST},
+			POJOINTIME = #{POJOINTIME},
+			EDUCATION = #{EDUCATION},
+			SCHOOL = #{SCHOOL},
+			MAJOR = #{MAJOR},
+			FTITLE = #{FTITLE},
+			CERTIFICATE = #{CERTIFICATE},
+			CONTRACTLENGTH = #{CONTRACTLENGTH},
+			CSTARTTIME = #{CSTARTTIME},
+			CENDTIME = #{CENDTIME},
+			ADDRESS = #{ADDRESS},
+			BZ = #{BZ}
+		where 
+			STAFF_ID = #{STAFF_ID}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			STAFF_ID = #{STAFF_ID}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+			a.STAFF_ID,
+			a.NAME,
+			a.NAME_EN,
+			a.BIANMA,	
+			a.DEPARTMENT_ID,	
+			a.TEL,	
+			a.SEX,
+			a.USER_ID,	
+			b.NAME DNAME
+		from 
+		<include refid="tableName"></include> a LEFT JOIN OA_DEPARTMENT b
+		on a.DEPARTMENT_ID = b.DEPARTMENT_ID
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+					a.NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or 
+					a.NAME_EN LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or 
+					a.BIANMA LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+				)
+		</if>
+		<if test="pd.DEPARTMENT_ID!=null and pd.DEPARTMENT_ID!=''"><!-- 部门检索 -->
+			and a.DEPARTMENT_ID in ${pd.item}
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			STAFF_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+	<!-- 绑定用户 -->
+	<update id="userBinding" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+			USER_ID = #{USER_ID}
+		where 
+			STAFF_ID = #{STAFF_ID}
+	</update>
+	
+	<!-- fh313596790qq(青苔) -->
+</mapper>
